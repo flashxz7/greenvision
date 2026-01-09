@@ -17,34 +17,49 @@ interface ChatPanelProps {
   messages: Message[]
 }
 
-function LoadingDots() {
+function LoadingPulse() {
   return (
-    <div className="loading-dots flex gap-1.5 items-center py-1">
-      <span className="w-2 h-2 bg-sage-500 rounded-full" />
-      <span className="w-2 h-2 bg-sage-500 rounded-full" />
-      <span className="w-2 h-2 bg-sage-500 rounded-full" />
+    <div className="flex items-center gap-1.5">
+      {[0, 1, 2].map(i => (
+        <div 
+          key={i}
+          className="w-2 h-2 rounded-full animate-pulse"
+          style={{
+            background: 'linear-gradient(135deg, #34d399, #10b981)',
+            boxShadow: '0 0 10px #10b981, 0 0 20px rgba(16, 185, 129, 0.5)',
+            animationDelay: `${i * 0.2}s`
+          }}
+        />
+      ))}
     </div>
   )
 }
 
-function MessageBubble({ message }: { message: Message }) {
+function MessageBubble({ message, isLast }: { message: Message; isLast: boolean }) {
   const isUser = message.type === 'user'
-  
+
   return (
     <div
-      className={`chat-bubble flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
+      className={`flex ${isUser ? 'justify-end' : 'justify-start'} ${isLast ? 'animate-slide-up' : ''}`}
     >
       <div
-        className={`max-w-[85%] ${
-          isUser
-            ? 'bg-gradient-to-br from-sage-600 to-sage-700 text-white rounded-2xl rounded-br-md'
-            : 'bg-white/90 backdrop-blur-sm text-forest border border-sage-100 rounded-2xl rounded-bl-md shadow-soft'
-        } px-4 py-3`}
+        className={`max-w-[85%] md:max-w-[70%] rounded-2xl ${isUser ? 'rounded-br-sm' : 'rounded-bl-sm'}`}
+        style={isUser ? {
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9))',
+          boxShadow: '0 4px 30px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.1)',
+        } : {
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          backdropFilter: 'blur(10px)',
+        }}
       >
         {/* User image preview */}
         {isUser && message.imageUrl && (
-          <div className="mb-2">
-            <div className="w-20 h-20 rounded-lg overflow-hidden border-2 border-white/30">
+          <div className="p-4 pb-0">
+            <div 
+              className="w-32 h-32 rounded-xl overflow-hidden"
+              style={{ boxShadow: '0 0 20px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(255,255,255,0.1)' }}
+            >
               <img
                 src={message.imageUrl}
                 alt="Uploaded item"
@@ -53,45 +68,31 @@ function MessageBubble({ message }: { message: Message }) {
             </div>
           </div>
         )}
-        
+
         {/* Location badge for user messages */}
         {isUser && message.city && message.state && (
-          <div className="flex items-center gap-1.5 mb-2 text-sage-200">
+          <div className="px-4 pt-3 flex items-center gap-2 text-emerald-100/80">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <span className="text-xs font-medium">
               {message.city}, {message.state}
             </span>
           </div>
         )}
-        
+
         {/* Message content or loading state */}
-        {message.isLoading ? (
-          <div className="flex items-center gap-3">
-            <div className="flex-shrink-0">
-              <div className="w-8 h-8 rounded-full bg-sage-100 flex items-center justify-center animate-pulse-soft">
-                <svg className="w-4 h-4 text-sage-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
+        <div className="p-4">
+          {message.isLoading ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-white/60 font-medium">Finding recycling options</span>
+              <LoadingPulse />
             </div>
-            <div>
-              <p className="text-sm text-sage-700 font-medium">Analyzing your item...</p>
-              <p className="text-xs text-sage-500 mt-0.5">Finding recycling options nearby</p>
-              <LoadingDots />
+          ) : (
+            <div className={`text-sm leading-relaxed whitespace-pre-wrap font-medium ${isUser ? 'text-white' : 'text-white/80'}`}>
+              {message.content}
             </div>
-          </div>
-        ) : (
-          <div className={`text-sm leading-relaxed whitespace-pre-wrap ${isUser ? 'text-white' : 'text-forest'}`}>
-            {message.content}
-          </div>
-        )}
-        
-        {/* Timestamp */}
-        <div className={`mt-2 text-[10px] ${isUser ? 'text-sage-200' : 'text-sage-400'}`}>
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          )}
         </div>
       </div>
     </div>
@@ -100,35 +101,25 @@ function MessageBubble({ message }: { message: Message }) {
 
 export default function ChatPanel({ messages }: ChatPanelProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
   }, [messages])
-  
+
   return (
     <div
       ref={scrollRef}
-      className="flex-1 overflow-y-auto px-4 py-4 space-y-2"
+      className="flex-1 overflow-y-auto px-6 py-4 space-y-4"
     >
-      {messages.map((message) => (
-        <MessageBubble key={message.id} message={message} />
+      {messages.map((message, index) => (
+        <MessageBubble 
+          key={message.id} 
+          message={message} 
+          isLast={index === messages.length - 1}
+        />
       ))}
-      
-      {/* Empty state */}
-      {messages.length === 0 && (
-        <div className="flex items-center justify-center h-full">
-          <div className="text-center text-sage-400">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sage-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-sage-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-            </div>
-            <p className="text-sm">Start by taking a photo</p>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

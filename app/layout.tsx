@@ -9,12 +9,12 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'GreenVision | Smart Recycling Helper',
-  description: 'Snap a photo, find recycling options near you. GreenVision uses AI to identify items and locate drop-off points in your area.',
+  title: 'GreenVision | Smart Recycling',
+  description: 'Capture any item, share your location, and discover recycling options near you.',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'GreenVision',
   },
   formatDetection: {
@@ -23,8 +23,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'GreenVision',
-    title: 'GreenVision | Smart Recycling Helper',
-    description: 'Snap a photo, find recycling options near you.',
+    title: 'GreenVision | Smart Recycling',
+    description: 'Capture any item, find recycling options near you.',
   },
   icons: {
     icon: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#5f714c',
+  themeColor: '#080f0c',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -52,13 +52,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} dark`}>
       <head>
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body className={`${inter.className} font-sans`}>
+      <body className={`${inter.className} font-sans antialiased`}>
         {children}
       </body>
     </html>

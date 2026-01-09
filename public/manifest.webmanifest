@@ -1,11 +1,11 @@
 {
-  "name": "GreenVision - Smart Recycling Helper",
+  "name": "GreenVision - Smart Recycling",
   "short_name": "GreenVision",
-  "description": "Snap a photo, find recycling options near you",
+  "description": "Capture any item, find recycling options near you",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fdf9f3",
-  "theme_color": "#5f714c",
+  "background_color": "#080f0c",
+  "theme_color": "#10b981",
   "orientation": "portrait",
   "icons": [
     {
