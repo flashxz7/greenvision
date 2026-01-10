@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useCallback, FormEvent, useRef, ChangeEvent, useEffect } from 'react'
+import { useState, FormEvent, useRef, ChangeEvent, useEffect } from 'react'
 
-// US States data
 const US_STATES = [
   { code: 'AL', name: 'Alabama' }, { code: 'AK', name: 'Alaska' }, { code: 'AZ', name: 'Arizona' },
   { code: 'AR', name: 'Arkansas' }, { code: 'CA', name: 'California' }, { code: 'CO', name: 'Colorado' },
@@ -37,25 +36,26 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 15)
 }
 
-// Theme Toggle Component
+// Theme Toggle
 function ThemeToggle({ isDark, onToggle }: { isDark: boolean; onToggle: () => void }) {
   return (
     <button
       onClick={onToggle}
-      className="relative w-14 h-7 rounded-full transition-all duration-300 flex items-center"
+      className="relative w-14 h-7 rounded-full transition-all duration-300"
       style={{
         background: isDark 
           ? 'linear-gradient(135deg, #1a2f23, #0f1f17)' 
           : 'linear-gradient(135deg, #e0f2e9, #d1fae5)',
         boxShadow: isDark 
           ? 'inset 0 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(16, 185, 129, 0.2)' 
-          : 'inset 0 2px 4px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.1)',
+          : 'inset 0 2px 4px rgba(0,0,0,0.1)',
       }}
     >
       <div
         className="absolute w-5 h-5 rounded-full transition-all duration-300 flex items-center justify-center"
         style={{
           left: isDark ? '30px' : '4px',
+          top: '4px',
           background: isDark 
             ? 'linear-gradient(135deg, #10b981, #059669)' 
             : 'linear-gradient(135deg, #fbbf24, #f59e0b)',
@@ -97,17 +97,9 @@ function LoadingPulse({ isDark }: { isDark: boolean }) {
   )
 }
 
-// State Select Component
-function StateSelect({ 
-  value, 
-  onChange, 
-  disabled, 
-  isDark 
-}: { 
-  value: string
-  onChange: (v: string) => void
-  disabled: boolean
-  isDark: boolean 
+// State Select
+function StateSelect({ value, onChange, disabled, isDark }: { 
+  value: string; onChange: (v: string) => void; disabled: boolean; isDark: boolean 
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -130,14 +122,6 @@ function StateSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const bgStyle = isDark 
-    ? { background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.1)' }
-    : { background: 'rgba(255,255,255,0.9)', borderColor: 'rgba(0,0,0,0.1)' }
-
-  const dropdownBg = isDark 
-    ? { background: 'rgba(15, 23, 20, 0.98)', borderColor: 'rgba(255,255,255,0.1)' }
-    : { background: 'rgba(255,255,255,0.98)', borderColor: 'rgba(0,0,0,0.1)' }
-
   return (
     <div className="relative flex-1" ref={dropdownRef}>
       <button
@@ -146,19 +130,16 @@ function StateSelect({
         disabled={disabled}
         className="w-full h-12 px-3 rounded-xl text-left transition-all duration-300 border text-sm font-medium disabled:opacity-40"
         style={{
-          ...bgStyle,
+          background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.9)',
+          borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
           color: value ? (isDark ? '#fff' : '#1f2937') : (isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'),
         }}
       >
-        <span className="block truncate pr-6">
-          {selectedState ? selectedState.name : 'State'}
-        </span>
+        <span className="block truncate pr-6">{selectedState ? selectedState.name : 'State'}</span>
         <svg 
-          className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           style={{ color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
@@ -166,8 +147,12 @@ function StateSelect({
       
       {isOpen && (
         <div 
-          className="absolute bottom-full left-0 right-0 mb-2 rounded-xl overflow-hidden z-50 border shadow-xl animate-slide-down"
-          style={{ ...dropdownBg, backdropFilter: 'blur(20px)' }}
+          className="absolute bottom-full left-0 right-0 mb-2 rounded-xl overflow-hidden z-50 border shadow-xl"
+          style={{ 
+            background: isDark ? 'rgba(15, 23, 20, 0.98)' : 'rgba(255,255,255,0.98)',
+            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+            backdropFilter: 'blur(20px)'
+          }}
         >
           <div className="p-2 border-b" style={{ borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
             <input
@@ -176,7 +161,7 @@ function StateSelect({
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search..."
               autoFocus
-              className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none"
+              className="w-full px-3 py-2 text-base rounded-lg border focus:outline-none"
               style={{
                 background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
                 borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
@@ -189,19 +174,11 @@ function StateSelect({
               <button
                 key={state.code}
                 type="button"
-                onClick={() => {
-                  onChange(state.code)
-                  setIsOpen(false)
-                  setSearch('')
-                }}
-                className="w-full px-3 py-2.5 text-left text-sm transition-colors"
+                onClick={() => { onChange(state.code); setIsOpen(false); setSearch(''); }}
+                className="w-full px-3 py-2.5 text-left text-sm"
                 style={{
-                  background: value === state.code 
-                    ? (isDark ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.1)') 
-                    : 'transparent',
-                  color: value === state.code 
-                    ? '#10b981' 
-                    : (isDark ? 'rgba(255,255,255,0.8)' : '#374151'),
+                  background: value === state.code ? (isDark ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.1)') : 'transparent',
+                  color: value === state.code ? '#10b981' : (isDark ? 'rgba(255,255,255,0.8)' : '#374151'),
                 }}
               >
                 <span className="font-semibold">{state.code}</span>
@@ -215,33 +192,25 @@ function StateSelect({
   )
 }
 
-// Message Component
+// Message Bubble
 function MessageBubble({ message, isLast, isDark }: { message: Message; isLast: boolean; isDark: boolean }) {
   const isUser = message.type === 'user'
   
-  const userStyle = {
-    background: 'linear-gradient(135deg, #10b981, #059669)',
-    boxShadow: isDark ? '0 4px 20px rgba(16,185,129,0.3)' : '0 4px 15px rgba(16,185,129,0.25)',
-  }
-
-  const assistantStyle = isDark ? {
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
-  } : {
-    background: 'rgba(255,255,255,0.9)',
-    border: '1px solid rgba(0,0,0,0.08)',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-  }
-  
   return (
-    <div 
-      className={`flex ${isUser ? 'justify-end' : 'justify-start'} ${isLast ? 'animate-slide-up' : ''}`}
-    >
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} ${isLast ? 'animate-slideUp' : ''}`}>
       <div 
         className="max-w-[88%] rounded-2xl"
         style={{
-          ...(isUser ? userStyle : assistantStyle),
-          borderRadius: isUser ? '20px 20px 6px 20px' : '20px 20px 20px 6px',
+          ...(isUser ? {
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+            boxShadow: isDark ? '0 4px 20px rgba(16,185,129,0.3)' : '0 4px 15px rgba(16,185,129,0.25)',
+            borderRadius: '20px 20px 6px 20px',
+          } : {
+            background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.9)',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+            boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.05)',
+            borderRadius: '20px 20px 20px 6px',
+          }),
         }}
       >
         {isUser && message.imageUrl && (
@@ -286,11 +255,7 @@ function MessageBubble({ message, isLast, isDark }: { message: Message; isLast: 
 export default function Home() {
   const [isDark, setIsDark] = useState(true)
   const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'intro',
-      type: 'assistant',
-      content: "Welcome to GreenVision.\n\nCapture any item, share your location, and discover the best recycling options near you.",
-    }
+    { id: 'intro', type: 'assistant', content: "Welcome to GreenVision.\n\nCapture any item, share your location, and discover the best recycling options near you." }
   ])
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -303,9 +268,7 @@ export default function Home() {
   const isFormValid = selectedFile && city.trim() && state
 
   useEffect(() => {
-    if (chatRef.current) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight
-    }
+    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight
   }, [messages])
 
   const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
@@ -332,23 +295,15 @@ export default function Home() {
     const currentCity = city.trim()
     const currentState = state
     const currentPreview = previewUrl
+    const currentFile = selectedFile
 
     const userMessage: Message = {
-      id: generateId(),
-      type: 'user',
-      content: 'Find recycling options',
-      imageUrl: currentPreview || undefined,
-      city: currentCity,
-      state: currentState,
+      id: generateId(), type: 'user', content: 'Find recycling options',
+      imageUrl: currentPreview || undefined, city: currentCity, state: currentState,
     }
 
     const loadingId = generateId()
-    setMessages(prev => [...prev, userMessage, {
-      id: loadingId,
-      type: 'assistant',
-      content: '',
-      isLoading: true,
-    }])
+    setMessages(prev => [...prev, userMessage, { id: loadingId, type: 'assistant', content: '', isLoading: true }])
     
     setSelectedFile(null)
     setPreviewUrl(null)
@@ -358,7 +313,7 @@ export default function Home() {
 
     try {
       const formData = new FormData()
-      formData.append('data', selectedFile)
+      formData.append('data', currentFile)
 
       const webhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://premai.app.n8n.cloud/webhook-test/recyclingimage'
 
@@ -367,33 +322,20 @@ export default function Home() {
 
       const response = await fetch(
         `${webhookUrl}?city=${encodeURIComponent(currentCity)}&state=${encodeURIComponent(currentState)}`,
-        { 
-          method: 'POST', 
-          body: formData, 
-          signal: controller.signal 
-        }
+        { method: 'POST', body: formData, signal: controller.signal }
       )
 
       clearTimeout(timeout)
-      
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`Server error: ${response.status}`)
 
       const text = await response.text()
-
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === loadingId ? { ...msg, content: text || 'No recycling options found.', isLoading: false } : msg
-        )
-      )
-    } catch (error) {
-      console.error('Webhook error:', error)
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === loadingId ? { ...msg, content: 'Unable to connect to recycling service. Please try again.', isLoading: false } : msg
-        )
-      )
+      setMessages(prev => prev.map(msg =>
+        msg.id === loadingId ? { ...msg, content: text || 'No recycling options found.', isLoading: false } : msg
+      ))
+    } catch {
+      setMessages(prev => prev.map(msg =>
+        msg.id === loadingId ? { ...msg, content: 'Unable to connect. Please try again.', isLoading: false } : msg
+      ))
     } finally {
       setIsLoading(false)
     }
@@ -409,15 +351,80 @@ export default function Home() {
   }
 
   return (
-    <div 
-      className="fixed inset-0 flex flex-col overflow-hidden"
-      style={{ 
-        background: theme.bg,
-        paddingTop: 'env(safe-area-inset-top)',
-      }}
-    >
-      {/* Background orbs */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
+    <div className="app-container" style={{ background: theme.bg }}>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        *, *::before, *::after {
+          box-sizing: border-box;
+          -webkit-tap-highlight-color: transparent;
+          margin: 0;
+          padding: 0;
+        }
+        
+        html {
+          height: 100%;
+          height: -webkit-fill-available;
+        }
+        
+        body {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          min-height: 100vh;
+          min-height: -webkit-fill-available;
+          overflow: hidden;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          background: ${theme.bg};
+        }
+        
+        #__next {
+          height: 100%;
+          min-height: 100vh;
+          min-height: -webkit-fill-available;
+        }
+        
+        .app-container {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          padding-top: env(safe-area-inset-top, 0px);
+          padding-left: env(safe-area-inset-left, 0px);
+          padding-right: env(safe-area-inset-right, 0px);
+        }
+        
+        .composer-wrapper {
+          padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        }
+        
+        input, textarea, select {
+          font-size: 16px !important;
+        }
+        
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideUp { animation: slideUp 0.4s ease-out; }
+        
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin { animation: spin 1s linear infinite; }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.3); border-radius: 2px; }
+      `}</style>
+      
+      {/* Background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         {isDark ? (
           <>
             <div className="absolute w-[500px] h-[500px] rounded-full opacity-40" style={{
@@ -477,17 +484,15 @@ export default function Home() {
       </main>
 
       {/* Composer */}
-      <div 
-        className="flex-shrink-0 p-3 relative z-10"
-        style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
-      >
+      <div className="composer-wrapper flex-shrink-0 px-3 pt-3 relative z-10">
         <form 
-          onSubmit={handleSubmit} 
+          onSubmit={handleSubmit}
           className="rounded-2xl p-3"
           style={{
             background: theme.composerBg,
             border: `1px solid ${theme.inputBorder}`,
             backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             boxShadow: isDark ? '0 -4px 30px rgba(0,0,0,0.3)' : '0 -4px 20px rgba(0,0,0,0.05)',
           }}
         >
@@ -499,7 +504,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleClearImage}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center bg-red-500"
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center bg-red-500 border-none cursor-pointer"
                 style={{ boxShadow: '0 2px 8px rgba(239,68,68,0.4)' }}
               >
                 <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -509,16 +514,8 @@ export default function Home() {
             </div>
           )}
           
-          <div className="flex items-center gap-2 mb-2">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleImageSelect}
-              className="hidden"
-              id="camera"
-            />
+          <div className="flex gap-2 mb-2">
+            <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handleImageSelect} className="hidden" id="camera" />
             <label
               htmlFor="camera"
               className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center cursor-pointer transition-all active:scale-95"
@@ -533,7 +530,6 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </label>
-
             <input
               type="text"
               value={city}
@@ -541,21 +537,16 @@ export default function Home() {
               placeholder="City"
               disabled={isLoading}
               className="flex-1 h-12 px-4 rounded-xl text-sm font-medium focus:outline-none disabled:opacity-40"
-              style={{
-                background: theme.inputBg,
-                border: `1px solid ${theme.inputBorder}`,
-                color: theme.text,
-              }}
+              style={{ background: theme.inputBg, border: `1px solid ${theme.inputBorder}`, color: theme.text }}
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex gap-2">
             <StateSelect value={state} onChange={setState} disabled={isLoading} isDark={isDark} />
-
             <button
               type="submit"
               disabled={!isFormValid || isLoading}
-              className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all active:scale-95 disabled:opacity-40"
+              className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all active:scale-95 disabled:opacity-40 border-none cursor-pointer"
               style={{
                 background: isFormValid && !isLoading ? 'linear-gradient(135deg, #10b981, #059669)' : theme.inputBg,
                 boxShadow: isFormValid && !isLoading ? (isDark ? '0 0 25px rgba(16,185,129,0.4)' : '0 4px 15px rgba(16,185,129,0.3)') : 'none',
