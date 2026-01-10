@@ -358,31 +358,40 @@ export default function Home() {
 
     try {
       const formData = new FormData()
-      formData.append('image', selectedFile)
+      formData.append('data', selectedFile)
 
-      const webhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL
-      if (!webhookUrl) throw new Error('Not configured')
+      const webhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || 'https://premai.app.n8n.cloud/webhook-test/recyclingimage'
 
       const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 30000)
+      const timeout = setTimeout(() => controller.abort(), 60000)
 
       const response = await fetch(
         `${webhookUrl}?city=${encodeURIComponent(currentCity)}&state=${encodeURIComponent(currentState)}`,
-        { method: 'POST', body: formData, signal: controller.signal }
+        { 
+          method: 'POST', 
+          body: formData, 
+          signal: controller.signal 
+        }
       )
 
       clearTimeout(timeout)
+      
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`)
+      }
+
       const text = await response.text()
 
       setMessages(prev =>
         prev.map(msg =>
-          msg.id === loadingId ? { ...msg, content: text || 'No options found.', isLoading: false } : msg
+          msg.id === loadingId ? { ...msg, content: text || 'No recycling options found.', isLoading: false } : msg
         )
       )
-    } catch {
+    } catch (error) {
+      console.error('Webhook error:', error)
       setMessages(prev =>
         prev.map(msg =>
-          msg.id === loadingId ? { ...msg, content: 'Unable to connect. Please try again.', isLoading: false } : msg
+          msg.id === loadingId ? { ...msg, content: 'Unable to connect to recycling service. Please try again.', isLoading: false } : msg
         )
       )
     } finally {
