@@ -410,8 +410,11 @@ export default function Home() {
 
   return (
     <div 
-      className="h-[100dvh] flex flex-col overflow-hidden relative"
-      style={{ background: theme.bg }}
+      className="fixed inset-0 flex flex-col overflow-hidden"
+      style={{ 
+        background: theme.bg,
+        paddingTop: 'env(safe-area-inset-top)',
+      }}
     >
       {/* Background orbs */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
@@ -474,7 +477,10 @@ export default function Home() {
       </main>
 
       {/* Composer */}
-      <div className="flex-shrink-0 p-3 pb-6 relative z-10">
+      <div 
+        className="flex-shrink-0 p-3 relative z-10"
+        style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
+      >
         <form 
           onSubmit={handleSubmit} 
           className="rounded-2xl p-3"
