@@ -1,3 +1,3 @@
-# 🌿 GreenVision - Smart Recycling Helper
+# GreenVision
 
 All in one tool for any recycling scenario
